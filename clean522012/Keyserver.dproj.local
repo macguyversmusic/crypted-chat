@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2012/01/18 13:12:39.000.765,=C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>2012/01/18 13:13:46.000.140,C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\Unit2.dfm=C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\crypted chat\RandomKeyServer.dfm</Transaction>
+    <Transaction>2012/01/18 13:13:46.000.140,C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\Unit2.pas=C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\crypted chat\RandomKeyServer.pas</Transaction>
+    <Transaction>2012/01/18 13:13:57.000.453,C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\Project1.dproj=C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\crypted chat\Keyserver.dproj</Transaction>
+    <Transaction>2012/01/26 01:15:59.000.587,C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\crypted chat\Keyserver.dproj=C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\crypted chat\Keyserver.dproj</Transaction>
+    <Transaction>2012/01/26 01:22:15.000.947,C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\crypted chat\tidy\Keyserver.dproj=C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\crypted chat\Keyserver.dproj</Transaction>
+    <Transaction>2012/01/26 01:26:16.000.290,C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\crypted chat\RandomKeyServer.pas=C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\crypted chat\tidy\RandomKeyServer.pas</Transaction>
+    <Transaction>2012/01/26 01:26:16.000.290,C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\crypted chat\RandomKeyServer.dfm=C:\Documents and Settings\r00t\My Documents\RAD Studio\Projects\crypted chat\tidy\RandomKeyServer.dfm</Transaction>
+  </Transactions>
+</BorlandProject>

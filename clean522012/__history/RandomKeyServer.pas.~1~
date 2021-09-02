@@ -1,0 +1,244 @@
+unit RandomKeyServer;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ScktComp, ExtCtrls, Math, StrUtils, shellapi, Menus ;
+
+type
+  TForm2 = class(TForm)
+    ServerSocket1: TServerSocket;
+    Timer1: TTimer;
+    Edit1: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    Button1: TButton;
+    Button2: TButton;
+    Edit2: TEdit;
+    Memo1: TMemo;
+    Button3: TButton;
+    PopupMenu1: TPopupMenu;
+    Button4: TButton;
+    function SendToAllClients( s : string) : boolean;
+    procedure Timer1Timer(Sender: TObject);
+    procedure ServerSocket1ClientConnect(Sender: TObject;
+      Socket: TCustomWinSocket);
+    procedure ServerSocket1ClientDisconnect(Sender: TObject;
+      Socket: TCustomWinSocket);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure sleepawhile;
+    procedure FormCreate(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
+  private
+    IconData: TNotifyIconData;
+    procedure CreateTrayIcon;
+    procedure MinimizeToTray;
+    procedure RestoreFromTray;
+    procedure ExitClick(Sender: TObject);
+    procedure RestoreClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+  public
+procedure WndProc(var Msg : TMessage); override;
+  end;
+
+var
+  Form2: TForm2;
+
+implementation
+var
+MyString : string;
+clients : integer;
+
+{$R *.dfm}
+
+procedure TForm2.Button1Click(Sender: TObject);
+begin
+ServerSocket1.Active := True;
+memo1.Lines.Add('listening on port '+IntToStr(serversocket1.Port));
+end;
+
+procedure TForm2.Button2Click(Sender: TObject);
+begin
+Serversocket1.Active := False;
+ServerSocket1.Close;
+end;
+
+
+function TForm2.SendToAllClients( s : string) : boolean;
+var
+    i : integer;
+begin
+if ServerSocket1.Socket.ActiveConnections = 0 then
+  begin
+  //
+  Exit;
+  end;
+for i := 0 to (ServerSocket1.Socket.ActiveConnections - 1) do
+  begin
+  ServerSocket1.Socket.Connections[i].SendText(s);
+  end;
+end;
+
+
+
+procedure TForm2.ServerSocket1ClientDisconnect(Sender: TObject;
+  Socket: TCustomWinSocket);
+begin
+clients := clients - 1;
+label2.Caption := IntToStr(clients) ;
+end;
+
+function StringToHexStr(const value: string): string;
+begin
+  SetLength(Result, Length(value) *2);
+  if Length(value) > 0 then
+    BinToHex(PChar(value), PChar(Result), Length(value));
+end;
+
+procedure Tform2.sleepawhile;
+begin
+  sysutils.Sleep(1000);
+end;
+
+procedure TForm2.Timer1Timer(Sender: TObject);
+var
+numa : integer;
+begin
+      Randomize;
+  numa := RandomRange(+1000000000000000, +9999999999999999);
+  MyString := IntToStr(numa);
+  numa := numa+StrToInt(MyString);
+  MyString  := IntToStr(numa+numa)+'F'+'x'+'/';
+  Edit1.Text := StringToHexStr(MyString);
+  try
+  SendToAllClients(Edit1.Text);
+  except
+    on E : Exception do
+     // ShowMessage(E.ClassName+' error raised, with message : '+E.Message);
+  end;
+end;
+
+procedure TForm2.Button3Click(Sender: TObject);
+var
+numa : integer;
+begin
+      Randomize;
+  numa := RandomRange(+1000000000000000, +9999999999999999);
+  MyString := IntToStr(numa);
+  numa := numa+StrToInt(MyString);
+  MyString  := IntToStr(numa+numa)+'F'+'x'+'/';
+  Edit1.Text := StringToHexStr(MyString);
+  try
+  SendToAllClients(Edit1.Text);
+  except
+    on E : Exception do
+     // ShowMessage(E.ClassName+' error raised, with message : '+E.Message);
+  end;
+end;
+
+procedure TForm2.Button4Click(Sender: TObject);
+begin
+MinimizeToTray;
+end;
+
+procedure TForm2.FormCreate(Sender: TObject);
+var
+  MenuItem: TMenuItem;
+begin
+  MenuItem := TMenuItem.Create(self);
+  MenuItem.Caption := '&Restore';
+  MenuItem.OnClick := RestoreClick;
+  PopupMenu1.Items.Add(MenuItem);
+  MenuItem := TMenuItem.Create(self);
+  MenuItem.Caption := 'E&xit';
+  MenuItem.OnClick := ExitClick;
+  PopupMenu1.Items.Add(MenuItem);
+  Form2.OnDestroy := FormDestroy;
+  CreateTrayIcon;
+end;
+procedure TForm2.WndProc(var Msg : TMessage); // Handle TrayIcon Events
+var
+  p : TPoint;
+begin
+  case Msg.Msg of
+    WM_USER + 1:       // This is our TrayIcon
+    case Msg.lParam of
+      WM_RBUTTONDOWN: begin  // User has RightClicked on TrayIcon
+         GetCursorPos(p);    // Get Cursor Position
+         PopupMenu1.Popup(p.x, p.y);  // Display Menu
+      end;
+      WM_LBUTTONDBLCLK: RestoreFromTray;  // User has DblClicked on TrayIcon
+    end;
+  end;
+  inherited;  // Continue to do the usual WndProc
+end;
+
+procedure TForm2.CreateTrayIcon;
+begin
+  IconData.cbSize := sizeof(IconData);
+  IconData.Wnd := Handle;  // Handle to our Form
+  IconData.uID := 100;
+  IconData.uFlags := NIF_MESSAGE + NIF_ICON + NIF_TIP;
+  IconData.uCallbackMessage := WM_USER + 1;  // Our Callback ID
+  IconData.hIcon := Application.Icon.Handle;  // Use our application Icon
+  StrPCopy(IconData.szTip, Application.Title);
+end;
+
+procedure TForm2.MinimizeToTray;
+begin
+  Shell_NotifyIcon(NIM_ADD, @IconData);  // Add Tray Icon here
+  Form2.Hide;  // Hide our Form...
+  ShowWindow(Application.Handle, SW_HIDE);  // ...and hide application from TaskBar.
+end;
+
+procedure TForm2.RestoreFromTray;
+begin
+  Shell_NotifyIcon(NIM_DELETE, @IconData);  // Delete TrayIcon
+  ShowWindow(Application.Handle, SW_SHOW);  // Show app on taskbar
+  Form2.Show;  // Show Form
+  Application.BringToFront;
+end;
+
+procedure TForm2.ExitClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TForm2.RestoreClick(Sender: TObject);
+begin
+  RestoreFromTray;
+end;
+
+procedure TForm2.FormDestroy(Sender: TObject);
+begin
+  Shell_NotifyIcon(NIM_DELETE, @IconData);
+end;
+
+procedure TForm2.ServerSocket1ClientConnect(Sender: TObject;
+  Socket: TCustomWinSocket);
+var
+numa : integer;
+begin
+
+memo1.Lines.Add('client connected');
+clients := clients + 1;
+label2.Caption := IntToStr(clients);
+      Randomize;
+  numa := RandomRange(+1000000000000000, +9999999999999999);
+  MyString := IntToStr(numa);
+  numa := numa+StrToInt(MyString);
+  MyString  := IntToStr(numa+numa)+'F'+'x'+'/';
+  Edit1.Text := StringToHexStr(MyString);
+  try
+  SendToAllClients(Edit1.Text);
+  except
+    on E : Exception do
+     // ShowMessage(E.ClassName+' error raised, with message : '+E.Message);
+  end;
+
+end;
+
+end.
